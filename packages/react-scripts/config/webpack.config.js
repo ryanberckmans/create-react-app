@@ -8,6 +8,10 @@
 // @remove-on-eject-end
 'use strict';
 
+const stdLibBrowser = require('node-stdlib-browser');
+const {
+  NodeProtocolUrlPlugin,
+} = require('node-stdlib-browser/helpers/webpack/plugin');
 const fs = require('fs');
 const path = require('path');
 const webpack = require('webpack');
@@ -306,7 +310,7 @@ module.exports = function (webpackEnv) {
       extensions: paths.moduleFileExtensions
         .map(ext => `.${ext}`)
         .filter(ext => useTypeScript || !ext.includes('ts')),
-      alias: {
+      alias: Object.assign({}, stdLibBrowser, {
         // Support React Native Web
         // https://www.smashingmagazine.com/2016/08/a-glimpse-into-the-future-with-react-native-for-web/
         'react-native': 'react-native-web',
@@ -316,7 +320,7 @@ module.exports = function (webpackEnv) {
           'scheduler/tracing': 'scheduler/tracing-profiling',
         }),
         ...(modules.webpackAliases || {}),
-      },
+      }),
       plugins: [
         // Prevents users from importing files from outside of src/ (or node_modules/).
         // This often causes confusion because we only process files within src/ with babel.
@@ -591,6 +595,11 @@ module.exports = function (webpackEnv) {
       ].filter(Boolean),
     },
     plugins: [
+      new NodeProtocolUrlPlugin(),
+      new webpack.ProvidePlugin({
+        process: stdLibBrowser.process,
+        Buffer: [stdLibBrowser.buffer, 'Buffer'],
+      }),
       // Generates an `index.html` file with the <script> injected.
       new HtmlWebpackPlugin(
         Object.assign(
