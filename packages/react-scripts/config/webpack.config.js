@@ -340,6 +340,13 @@ module.exports = function (webpackEnv) {
     module: {
       strictExportPresence: true,
       rules: [
+        {
+          // enable loading of *.mjs modules even when the .mjs extension isn't fully specified in the import statement. https://github.com/graphql/graphql-js/issues/2721#issuecomment-723008284
+          test: /\.m?js/,
+          resolve: {
+            fullySpecified: false,
+          },
+        },
         // Handle node_modules packages that contain sourcemaps
         shouldUseSourceMap && {
           enforce: 'pre',
