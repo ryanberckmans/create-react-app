@@ -285,6 +285,10 @@ module.exports = function (webpackEnv) {
       ],
     },
     resolve: {
+      fallback: {
+        // list of modules that when not found, have been manually configured to redirect to load a different module. This can be used, for example, to explicitly manage the list of polyfills bundled into create-react-app. If create-react-app gives the error "BREAKING CHANGE: webpack < 5 used to include polyfills for node.js core modules by default. This is no longer the case.Verify if you need this module and configure a polyfill for it." --> you can do these steps 1) add the polyfill fallback config here, 2) add the underlying polyfill library to the project using create-react-app. For example, below we have the `crypto` polyfill that delegates to the underlying `crypto-browserify` library, and the project using this config needs to manually add `crypto-browserify` to its dependencies in package.json. https://webpack.js.org/configuration/resolve/#resolvefallback
+        crypto: require.resolve('crypto-browserify'),
+      },
       // This allows you to set a fallback for where webpack should look for modules.
       // We placed these paths second because we want `node_modules` to "win"
       // if there are any conflicts. This matches Node resolution mechanism.
