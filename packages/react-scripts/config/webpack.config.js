@@ -41,6 +41,7 @@ const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin'
 const getCacheIdentifier = require('react-dev-utils/getCacheIdentifier');
 // @remove-on-eject-end
 const createEnvironmentHash = require('./webpack/persistentCache/createEnvironmentHash');
+const { NormalModuleReplacementPlugin } = require('webpack');
 
 // Source maps are resource heavy and can cause out of memory issue for large source files.
 const shouldUseSourceMap = process.env.GENERATE_SOURCEMAP !== 'false';
@@ -602,6 +603,19 @@ module.exports = function (webpackEnv) {
       ].filter(Boolean),
     },
     plugins: [
+      new NormalModuleReplacementPlugin(/^connectkit[\\/](.*)$/, resource => {
+        if (resource.request.startsWith('connectkit/react')) {
+          resource.request = resource.request.replace(
+            'connectkit/react',
+            'react'
+          );
+        } else if (resource.request.startsWith('connectkit/react-dom')) {
+          resource.request = resource.request.replace(
+            'connectkit/react-dom',
+            'react-dom'
+          );
+        }
+      }),
       new NodeProtocolUrlPlugin(),
       new webpack.ProvidePlugin({
         process: stdLibBrowser.process,
